@@ -1,0 +1,244 @@
+import pygame
+import random
+import numpy as np
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 600, 400
+CELL_SIZE = 20
+SNAKE_SPEED = 10
+
+# Colors
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Directions
+UP = (0, -1)
+DOWN = (0, 1)
+LEFT = (-1, 0)
+RIGHT = (1, 0)
+
+class Snake:
+    def __init__(self):
+        self.body = [(5, 5)]
+        self.direction = RIGHT
+        self.grow = False
+
+    def move(self):
+        head_x, head_y = self.body[0]
+        dir_x, dir_y = self.direction
+        new_head = (head_x + dir_x, head_y + dir_y)
+        
+        if self.grow:
+            self.body.insert(0, new_head)
+            self.grow = False
+        else:
+            self.body.insert(0, new_head)
+            self.body.pop()
+
+    def change_direction(self, new_direction):
+        opposite_direction = (-self.direction[0], -self.direction[1])
+        if new_direction != opposite_direction:
+            self.direction = new_direction
+
+    def grow_snake(self):
+        self.grow = True
+
+class Food:
+    def __init__(self):
+        self.position = (random.randint(0, (WIDTH - CELL_SIZE) // CELL_SIZE), 
+                         random.randint(0, (HEIGHT - CELL_SIZE) // CELL_SIZE))
+
+    def spawn_food(self):
+        self.position = (random.randint(0, (WIDTH - CELL_SIZE) // CELL_SIZE), 
+                         random.randint(0, (HEIGHT - CELL_SIZE) // CELL_SIZE))
+
+class SnakeAI:
+    def __init__(self, snake):
+        self.snake = snake
+
+    def decide_direction(self, food_position):
+        head = self.snake.body[0]
+        direction_vector = np.array(food_position) - np.array(head)
+        
+        if abs(direction_vector[0]) > abs(direction_vector[1]):
+            return RIGHT if direction_vector[0] > 0 else LEFT
+        else:
+            return DOWN if direction_vector[1] > 0 else UP
+
+def draw_window(snake, food):
+    window.fill(BLACK)
+    for segment in snake.body:
+        pygame.draw.rect(window, GREEN, (segment[0] * CELL_SIZE, segment[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+    food_pos = food.position
+    pygame.draw.rect(window, RED, (food_pos[0] * CELL_SIZE, food_pos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+    pygame.display.flip()
+
+# Main game function
+def main():
+    global window
+    window = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("AI Snake Game")
+
+    snake = Snake()
+    food = Food()
+    ai = SnakeAI(snake)
+    
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        clock.tick(SNAKE_SPEED)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        # AI decides the direction to move
+        direction = ai.decide_direction(food.position)
+        snake.change_direction(direction)
+        snake.move()
+        
+        # Check if snake eats food
+        if snake.body[0] == food.position:
+            snake.grow_snake()
+            food.spawn_food()
+        
+        # Draw everything
+        draw_window(snake, food)
+
+        # Check for collisions with walls or self
+        if (snake.body[0][0] < 0 or snake.body[0][0] >= WIDTH // CELL_SIZE or
+                snake.body[0][1] < 0 or snake.body[0][1] >= HEIGHT // CELL_SIZE or
+                len(snake.body) != len(set(snake.body))):
+            running = False
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
+import pygame
+import random
+import numpy as np
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 600, 400
+CELL_SIZE = 20
+SNAKE_SPEED = 10
+
+# Colors
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Directions
+UP = (0, -1)
+DOWN = (0, 1)
+LEFT = (-1, 0)
+RIGHT = (1, 0)
+
+class Snake:
+    def __init__(self):
+        self.body = [(5, 5)]
+        self.direction = RIGHT
+        self.grow = False
+
+    def move(self):
+        head_x, head_y = self.body[0]
+        dir_x, dir_y = self.direction
+        new_head = (head_x + dir_x, head_y + dir_y)
+        
+        if self.grow:
+            self.body.insert(0, new_head)
+            self.grow = False
+        else:
+            self.body.insert(0, new_head)
+            self.body.pop()
+
+    def change_direction(self, new_direction):
+        opposite_direction = (-self.direction[0], -self.direction[1])
+        if new_direction != opposite_direction:
+            self.direction = new_direction
+
+    def grow_snake(self):
+        self.grow = True
+
+class Food:
+    def __init__(self):
+        self.position = (random.randint(0, (WIDTH - CELL_SIZE) // CELL_SIZE), 
+                         random.randint(0, (HEIGHT - CELL_SIZE) // CELL_SIZE))
+
+    def spawn_food(self):
+        self.position = (random.randint(0, (WIDTH - CELL_SIZE) // CELL_SIZE), 
+                         random.randint(0, (HEIGHT - CELL_SIZE) // CELL_SIZE))
+
+class SnakeAI:
+    def __init__(self, snake):
+        self.snake = snake
+
+    def decide_direction(self, food_position):
+        head = self.snake.body[0]
+        direction_vector = np.array(food_position) - np.array(head)
+        
+        if abs(direction_vector[0]) > abs(direction_vector[1]):
+            return RIGHT if direction_vector[0] > 0 else LEFT
+        else:
+            return DOWN if direction_vector[1] > 0 else UP
+
+def draw_window(snake, food):
+    window.fill(BLACK)
+    for segment in snake.body:
+        pygame.draw.rect(window, GREEN, (segment[0] * CELL_SIZE, segment[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+    food_pos = food.position
+    pygame.draw.rect(window, RED, (food_pos[0] * CELL_SIZE, food_pos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+    pygame.display.flip()
+
+# Main game function
+def main():
+    global window
+    window = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("AI Snake Game")
+
+    snake = Snake()
+    food = Food()
+    ai = SnakeAI(snake)
+    
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        clock.tick(SNAKE_SPEED)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        # AI decides the direction to move
+        direction = ai.decide_direction(food.position)
+        snake.change_direction(direction)
+        snake.move()
+        
+        # Check if snake eats food
+        if snake.body[0] == food.position:
+            snake.grow_snake()
+            food.spawn_food()
+        
+        # Draw everything
+        draw_window(snake, food)
+
+        # Check for collisions with walls or self
+        if (snake.body[0][0] < 0 or snake.body[0][0] >= WIDTH // CELL_SIZE or
+                snake.body[0][1] < 0 or snake.body[0][1] >= HEIGHT // CELL_SIZE or
+                len(snake.body) != len(set(snake.body))):
+            running = False
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
